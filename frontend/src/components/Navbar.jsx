@@ -7,9 +7,7 @@ export default function Navbar(){
     <div className="nav">
       <div className="nav-inner">
         <div className="spacer" />
-        {pathname.startsWith('/forms') && (
-          <Link to="/create" className="btn small">Create a new form..</Link>
-        )}
+  {/* Removed 'Create a new form..' button */}
         <div className="badge">
           <div className="avatar" />
           <div>

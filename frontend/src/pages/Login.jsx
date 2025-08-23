@@ -12,8 +12,10 @@ export default function Login(){
   }
 
   return (
-    <div className="container">
-      <div className="h1">Log in</div>
+    <div>
+      <div style={{position: 'fixed', top: 24, left: 32, color: '#111', fontWeight: 700, fontSize: 28, letterSpacing: 2, zIndex: 1000}}>rvwd</div>
+      <div className="container">
+        <div className="h1">Log in</div>
 
       <form onSubmit={handleSubmit} className="card" style={{maxWidth:720}}>
         <div className="col">
@@ -34,9 +36,17 @@ export default function Login(){
 
       <div style={{height:120}}></div>
 
-      <div style={{display:'flex',gap:16,justifyContent:'center'}}>
+      <div style={{
+        display: 'flex',
+        gap: 16,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        maxWidth: 720,
+        margin: '0 auto'
+      }}>
         <button className="btn secondary" style={{minWidth:200}}>Create a new account</button>
         <button className="btn ghost" style={{minWidth:240}}>Continue with Google</button>
+      </div>
       </div>
     </div>
   )

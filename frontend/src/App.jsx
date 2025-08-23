@@ -1,4 +1,4 @@
-import { Routes, Route, Link, Navigate } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import FormDetail from './pages/FormDetail.jsx'
@@ -10,12 +10,12 @@ export default function App(){
     <div>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+  <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forms" element={<Dashboard />} />
         <Route path="/forms/:id" element={<FormDetail />} />
         <Route path="/create" element={<CreateForm />} />
-        <Route path="*" element={<NotFound />} />
+  <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   )
