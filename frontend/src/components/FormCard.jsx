@@ -66,26 +66,28 @@ export default function FormCard({ form }){
   }
   return (
   <Link to={`/forms/${form.id}`} className="card" style={{display:'flex',flexDirection:'column',alignItems:'stretch',gap:12,position:'relative',height:'100%', textDecoration:'none', color:'inherit', cursor:'pointer'}}>
-      <button
-        onClick={e => { e.preventDefault(); handleDelete(); }}
+      <Link
+        to={`/share/${form.id}`}
+        onClick={e => e.stopPropagation()}
         style={{
           position: 'absolute',
           top: 8,
           right: 8,
-          width: 28,
-          height: 28,
+          padding: '4px 12px',
           border: 'none',
-          borderRadius: '50%',
-          background: '#eee',
-          color: '#c00',
+          borderRadius: '16px',
+          background: '#1976d2',
+          color: '#fff',
           fontWeight: 'bold',
-          fontSize: 18,
+          fontSize: 13,
           cursor: 'pointer',
-          zIndex: 2
+          zIndex: 2,
+          textDecoration: 'none',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
         }}
-        title="Delete"
-        aria-label="Delete form"
-      >-</button>
+        title="Share"
+        aria-label="Share form"
+      >Share</Link>
       <div className="h3" style={{
         marginTop: 0,
         marginBottom: 8,

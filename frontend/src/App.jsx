@@ -5,7 +5,7 @@ import FormDetail from './pages/FormDetail.jsx'
 import CreateForm from './pages/CreateForm.jsx'
 import Navbar from './components/Navbar.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
-
+import SharePage from './pages/SharePage.jsx';
 import { useLocation } from 'react-router-dom'
 
 export default function App(){
@@ -26,6 +26,7 @@ export default function App(){
           <Route path="/forms" element={<Dashboard />} />
           <Route path="/forms/:id" element={<FormDetail />} />
           <Route path="/create" element={<CreateForm />} />
+          <Route path="/share/:id" element={<SharePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
