@@ -16,7 +16,8 @@ export default function CreateFormModal({ onClose }) {
         id: Date.now().toString(),
         title,
         snippet,
-        score: parseFloat(score)
+        score: parseFloat(score),
+        createdAt: new Date().toISOString()
       }
     ]);
     onClose();
@@ -35,7 +36,7 @@ export default function CreateFormModal({ onClose }) {
       alignItems: 'center',
       justifyContent: 'center',
     }}>
-      <div className="card" style={{maxWidth:520, width:'100%', position:'relative'}}>
+  <div className="card" style={{maxWidth:520, width:'100%', position:'relative', paddingBottom:32}}>
         <button onClick={onClose} style={{position:'absolute',top:12,right:16,fontSize:24,background:'none',border:'none',color:'#888',cursor:'pointer'}}>&times;</button>
   <div className="h1">Create New Form</div>
         <form onSubmit={handleSubmit}>
@@ -49,7 +50,7 @@ export default function CreateFormModal({ onClose }) {
             <label className="label">Score (0-10)</label>
             <input className="input" type="number" min="0" max="10" step="0.1" placeholder="Value" value={score} onChange={e=>setScore(e.target.value)} />
 
-            <button className="btn" type="submit">Submit</button>
+            <button className="btn" type="submit" style={{marginTop:32, marginBottom:16}}>Submit</button>
           </div>
         </form>
       </div>

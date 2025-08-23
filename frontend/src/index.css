@@ -75,8 +75,8 @@ button{cursor:pointer}
 .avatar{width:28px;height:28px;border-radius:50%;background:#ddd}
 .spacer{flex:1}
 
-.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
-@media (max-width:900px){.grid-3{grid-template-columns:1fr}}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(min-width:768px){.grid-3{grid-template-columns:1fr}}
 
 .form-row{display:flex;gap:10px;align-items:center}
 

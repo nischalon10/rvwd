@@ -17,8 +17,8 @@ function getScoreColor(value) {
 }
 
 function Donut({ value }) {
-  const radius = 28;
-  const stroke = 6;
+  const radius = 28 * 1.4; // 40% bigger
+  const stroke = 6 * 1.4;
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const percent = Math.max(0, Math.min(1, value / 10));
@@ -51,7 +51,7 @@ function Donut({ value }) {
         y="50%"
         textAnchor="middle"
         dy=".3em"
-        fontSize="16"
+        fontSize="22"
         fontWeight="bold"
         fill="#222"
       >{value}</text>
@@ -65,9 +65,9 @@ export default function FormCard({ form }){
     setForms(forms.filter(f => f.id !== form.id));
   }
   return (
-    <div className="card" style={{display:'flex',alignItems:'center',gap:16,position:'relative'}}>
+  <Link to={`/forms/${form.id}`} className="card" style={{display:'flex',flexDirection:'column',alignItems:'stretch',gap:12,position:'relative',height:'100%', textDecoration:'none', color:'inherit', cursor:'pointer'}}>
       <button
-        onClick={handleDelete}
+        onClick={e => { e.preventDefault(); handleDelete(); }}
         style={{
           position: 'absolute',
           top: 8,
@@ -86,16 +86,39 @@ export default function FormCard({ form }){
         title="Delete"
         aria-label="Delete form"
       >-</button>
-      <Donut value={form.score} />
-      <div style={{flex:1}}>
-        <div className="h3" style={{marginTop:0}}>
-          <Link to={`/forms/${form.id}`}>{form.title}</Link>
+      <div className="h3" style={{
+        marginTop: 0,
+        marginBottom: 8,
+        textAlign: 'left',
+        paddingRight: 0,
+        wordBreak: 'break-word',
+        overflowWrap: 'break-word',
+        maxHeight: '2.6em',
+        lineHeight: '1.3',
+        display: '-webkit-box',
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        flexShrink: 0
+      }}>
+        {form.title}
+      </div>
+      <div style={{display:'flex', flexDirection:'row', alignItems:'stretch', gap:16, marginBottom:8, flex:1}}>
+        <div style={{flexShrink:0, display:'flex', alignItems:'center'}}>
+          <Donut value={form.score} />
         </div>
-        <p style={{maxWidth:560, marginBottom:8}}>{form.snippet}</p>
-        <div style={{display:'flex', justifyContent:'flex-end', width:'100%'}}>
-          <Link to={`/forms/${form.id}`} className="btn small secondary" style={{fontStyle:'italic'}}>Expand</Link>
+        <div style={{flex:1, maxWidth:'100%', overflow:'auto', display:'flex', alignItems:'center'}}>
+          <p style={{margin:0}}>{form.snippet}</p>
         </div>
       </div>
-    </div>
+  {/* Description is now only in the row with the score */}
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', flexShrink: 0, marginTop: 8}}>
+        <div style={{fontSize:13, color:'#666', textAlign:'left', marginRight: 16}}>
+          <span style={{fontWeight:600}}>Date Created:</span>{' '}
+          <span>{form.createdAt ? new Date(form.createdAt).toLocaleDateString() : 'N/A'}</span>
+        </div>
+  {/* View Responses button removed; card itself is now clickable */}
+      </div>
+  </Link>
   )
 }

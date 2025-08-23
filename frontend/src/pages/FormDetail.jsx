@@ -14,9 +14,9 @@ export default function FormDetail() {
             </button>
             <div className="h2" style={{margin:0}}>Latest reviews</div>
           </div>
-          <div className="grid-3">
+          <div style={{display:'flex', margin:'16px 0', width:'100%'}}>
             {latestReviews.map(card => (
-              <div className="card" key={card.id} style={{height:140}}>
+              <div className="card" key={card.id} style={{height:200, flex:'1 1 0', minWidth:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
                 <div className="helper">☆☆☆☆☆</div>
                 <div className="h3">{card.title}</div>
                 <div className="helper">{card.score}</div>
