@@ -1,6 +1,21 @@
 import { Link } from 'react-router-dom'
 import { useForms } from '../context/FormsContext'
 
+function getScoreColor(value) {
+  // 0 = dark red, 5 = yellow, 10 = dark green
+  if (value <= 5) {
+    // Red to yellow
+    const r = 200;
+    const g = Math.round(40 + (value / 5) * 160); // 40 to 200
+    return `rgb(${r},${g},40)`;
+  } else {
+    // Yellow to green
+    const r = Math.round(200 - ((value - 5) / 5) * 120); // 200 to 80
+    const g = Math.round(200 - ((10 - value) / 5) * 120); // 200 to 320 (clamped at 200)
+    return `rgb(${r},${Math.min(g,200)},40)`;
+  }
+}
+
 function Donut({ value }) {
   const radius = 28;
   const stroke = 6;
@@ -8,6 +23,7 @@ function Donut({ value }) {
   const circumference = normalizedRadius * 2 * Math.PI;
   const percent = Math.max(0, Math.min(1, value / 10));
   const strokeDashoffset = circumference * (1 - percent);
+  const color = getScoreColor(value);
   return (
     <svg height={radius * 2} width={radius * 2}>
       <circle
@@ -19,7 +35,7 @@ function Donut({ value }) {
         r={normalizedRadius}
       />
       <circle
-        stroke="#2ecc40"
+        stroke={color}
         fill="none"
         strokeWidth={stroke}
         strokeLinecap="round"
@@ -28,7 +44,7 @@ function Donut({ value }) {
         cx={radius}
         cy={radius}
         r={normalizedRadius}
-        style={{transition: 'stroke-dashoffset 0.5s'}}
+        style={{transition: 'stroke-dashoffset 0.5s, stroke 0.5s'}}
       />
       <text
         x="50%"
@@ -76,7 +92,9 @@ export default function FormCard({ form }){
           <Link to={`/forms/${form.id}`}>{form.title}</Link>
         </div>
         <p style={{maxWidth:560, marginBottom:8}}>{form.snippet}</p>
-        <Link to={`/forms/${form.id}`} className="btn small secondary">Click for more insights..</Link>
+        <div style={{display:'flex', justifyContent:'flex-end', width:'100%'}}>
+          <Link to={`/forms/${form.id}`} className="btn small secondary" style={{fontStyle:'italic'}}>Expand</Link>
+        </div>
       </div>
     </div>
   )

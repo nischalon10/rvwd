@@ -26,7 +26,7 @@ export default function CreateForm(){
 
   return (
     <div className="container">
-      <div className="h1">Create New</div>
+  <div className="h1">Create New Form</div>
       <form className="card" style={{maxWidth:520}} onSubmit={handleSubmit}>
         <div className="col">
           <label className="label">Name</label>

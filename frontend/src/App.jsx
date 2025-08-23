@@ -4,20 +4,32 @@ import Dashboard from './pages/Dashboard.jsx'
 import FormDetail from './pages/FormDetail.jsx'
 import CreateForm from './pages/CreateForm.jsx'
 import Navbar from './components/Navbar.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
+
+import { useLocation } from 'react-router-dom'
 
 export default function App(){
+  const location = useLocation()
+  const isLogin = location.pathname === '/' || location.pathname === '/login'
   return (
-    <div>
-      <Navbar />
-      <Routes>
-  <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forms" element={<Dashboard />} />
-        <Route path="/forms/:id" element={<FormDetail />} />
-        <Route path="/create" element={<CreateForm />} />
-  <Route path="*" element={<NotFound />} />
-      </Routes>
-    </div>
+    <AuthProvider>
+      <div>
+        {!isLogin && (
+          <div style={{position: 'fixed', top: 24, left: 32, color: '#111', fontWeight: 700, fontSize: 28, letterSpacing: 2, zIndex: 1000, pointerEvents:'none'}}>
+            rvwd
+          </div>
+        )}
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forms" element={<Dashboard />} />
+          <Route path="/forms/:id" element={<FormDetail />} />
+          <Route path="/create" element={<CreateForm />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </AuthProvider>
   )
 }
 
