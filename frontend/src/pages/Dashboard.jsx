@@ -1,43 +1,173 @@
+import { useEffect, useMemo, useState } from 'react';
 import FormCard from '../components/FormCard';
 import { useForms } from '../context/FormsContext';
-import { useState } from 'react';
 import CreateFormModal from '../components/CreateFormModal';
 import FilterButton from '../components/FilterButton';
+import styles from './Dashboard.module.css';
+
 export default function Dashboard() {
   const { forms } = useForms();
   const [showModal, setShowModal] = useState(false);
   // filterMode: 0 = default, 1 = descending, 2 = ascending
   const [filterMode, setFilterMode] = useState(0);
+  const [query, setQuery] = useState('');
 
-  let displayedForms = forms;
-  if (filterMode === 1) {
-    displayedForms = [...forms].sort((a, b) => b.score - a.score);
-  } else if (filterMode === 2) {
-    displayedForms = [...forms].sort((a, b) => a.score - b.score);
-  }
+  // Motion preferences
+  const [mounted, setMounted] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'matchMedia' in window) {
+      const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setReduceMotion(mql.matches);
+      const onChange = (e) => setReduceMotion(e.matches);
+      mql.addEventListener?.('change', onChange);
+      mql.addListener?.(onChange);
+      return () => {
+        mql.removeEventListener?.('change', onChange);
+        mql.removeListener?.(onChange);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return forms;
+    return forms.filter(f =>
+      (f.title && f.title.toLowerCase().includes(q)) ||
+      (f.snippet && f.snippet.toLowerCase().includes(q))
+    );
+  }, [forms, query]);
+
+  const displayedForms = useMemo(() => {
+    let list = filtered;
+    if (filterMode === 1) {
+      list = [...filtered].sort((a, b) => b.score - a.score);
+    } else if (filterMode === 2) {
+      list = [...filtered].sort((a, b) => a.score - b.score);
+    }
+    return list;
+  }, [filtered, filterMode]);
+
+  const averageScore = useMemo(() => {
+    if (!forms.length) return '-';
+    const avg = forms.reduce((sum, f) => sum + (Number(f.score) || 0), 0) / forms.length;
+    return avg.toFixed(1);
+  }, [forms]);
+
+  const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const transitionBase = reduceMotion ? 'none' : `transform 600ms ${EASE}, opacity 600ms ${EASE}`;
 
   function handleFilterClick() {
     setFilterMode(mode => (mode + 1) % 3);
   }
 
   return (
-    <div className="container">
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
-        <div className="h1" style={{margin:0}}>Dashboard</div>
-        <div style={{display:'flex',alignItems:'center',position:'relative'}}>
-          <button className="btn" style={{ background: '#111', color: '#fff', border: 'none' }} onClick={()=>setShowModal(true)}>Create New Form</button>
-          <FilterButton onClick={handleFilterClick} active={filterMode !== 0} />
-        </div>
-      </div>
-      <div className="grid-3">
-        {displayedForms.map(f => (
-          <div key={f.id} className="dashboard-square">
-            <FormCard form={f} />
+    <div className={styles['dashboard-bg']}>
+      {/* Content container */}
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Header card */}
+        <div
+          className={styles.glass}
+          style={{
+            padding: 20,
+            margin: '12px 0 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            transform: mounted || reduceMotion ? 'none' : 'translateY(8px)',
+            opacity: mounted || reduceMotion ? 1 : 0,
+            transition: transitionBase,
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <h1 className={styles['dashboard-title']}>Dashboard</h1>
+            <div className={styles.subtle} style={{ fontSize: 14 }}>
+              {forms.length} total forms • Avg score {averageScore}
+            </div>
           </div>
-        ))}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+              <input
+                className="input"
+                type="search"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search forms..."
+                aria-label="Search forms"
+                style={{
+                  minWidth: 220,
+                  background: 'rgba(255,255,255,0.9)',
+                  borderColor: 'rgba(255,255,255,0.35)',
+                }}
+              />
+            </div>
+            <FilterButton onClick={handleFilterClick} />
+            <button className={styles['create-btn']} onClick={() => setShowModal(true)}>
+              Create New Form
+            </button>
+          </div>
+        </div>
+
+        {/* Grid of forms */}
+        {displayedForms.length > 0 ? (
+          <div
+            // Override grid to a responsive, professional layout
+            className="grid-3"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: 20,
+              alignItems: 'stretch',
+            }}
+          >
+            {displayedForms.map((f, idx) => (
+              <div
+                key={f.id}
+                className="dashboard-square"
+                style={{
+                  transform: mounted || reduceMotion ? 'none' : 'translateY(10px)',
+                  opacity: mounted || reduceMotion ? 1 : 0,
+                  transition: reduceMotion ? 'none' : `transform 600ms ${EASE}, opacity 600ms ${EASE}`,
+                  transitionDelay: reduceMotion ? '0ms' : `${40 + idx * 30}ms`,
+                }}
+              >
+                <FormCard form={f} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            className={styles.glass}
+            style={{
+              padding: 32,
+              marginTop: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              color: '#e2e8f0',
+              transform: mounted || reduceMotion ? 'none' : 'translateY(8px)',
+              opacity: mounted || reduceMotion ? 1 : 0,
+              transition: transitionBase,
+            }}
+          >
+            <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No results</div>
+            <div style={{ fontSize: 14, opacity: 0.85, marginBottom: 16 }}>Try adjusting your search or create a new form.</div>
+            <button className={styles['create-btn']} onClick={() => setShowModal(true)}>Create New Form</button>
+          </div>
+        )}
+
+        {showModal && <CreateFormModal onClose={() => setShowModal(false)} />}
       </div>
-      {showModal && <CreateFormModal onClose={()=>setShowModal(false)} />}
     </div>
   );
 }
-

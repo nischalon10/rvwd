@@ -1,77 +1,49 @@
 .dashboard-bg {
   min-height: 100vh;
-  background: linear-gradient(120deg, #181a20 0%, #232946 100%);
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   position: relative;
-  overflow: hidden;
 }
 
-.neon-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(16px);
-  opacity: 0.7;
-  animation: float 8s ease-in-out infinite alternate;
-}
-
-.neon1 {
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, #00fff7 0%, #232946 80%);
-  top: -80px;
-  left: -80px;
-  animation-delay: 0s;
-}
-
-.neon2 {
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, #ff00ea 0%, #232946 80%);
-  bottom: 40px;
-  right: 60px;
-  animation-delay: 2s;
-}
-
-.neon3 {
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, #00ff85 0%, #232946 80%);
-  top: 60px;
-  right: 120px;
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(40px) scale(1.08); }
-}
-
+/* Neutral card surface */
 .glass {
-  background: rgba(255,255,255,0.08);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px 0 #23294644;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(2, 6, 23, 0.06);
+  border: 1px solid #e5e7eb;
 }
 
 .dashboard-title {
-  color: #fff;
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: 2px;
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
   margin: 0;
 }
 
+.subtle {
+  color: #475569; /* slate-600 */
+}
+
+/* Primary action button (neutral, enterprise) */
 .create-btn {
-  background: linear-gradient(90deg, #00fff7 0%, #ff00ea 100%);
-  color: #181a20;
-  border: none;
-  font-weight: 700;
+  background: #111111;
+  color: #ffffff;
+  border: 1px solid #0b1220;
+  font-weight: 600;
   border-radius: 8px;
-  padding: 0.7em 1.6em;
-  font-size: 1rem;
-  box-shadow: 0 2px 16px #00fff766;
-  transition: filter 0.2s;
+  padding: 0.6em 1.2em;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 14px rgba(2, 6, 23, 0.08);
+  transition: background-color 180ms ease, box-shadow 200ms ease, transform 120ms ease;
 }
 .create-btn:hover {
-  filter: brightness(1.2) drop-shadow(0 0 8px #ff00ea);
+  background: #0b0b0b;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.12);
+}
+.create-btn:active {
+  transform: translateY(0.5px);
+}
+.create-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
 }
