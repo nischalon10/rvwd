@@ -1,0 +1,118 @@
+.page {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100vh;
+}
+
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  color: #0f172a;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.meta {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  color: #1f2937;
+  display: inline-flex;
+  align-items: center;
+}
+.backBtn:hover {
+  background: #f1f5f9;
+}
+.backBtn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggleLabel {
+  color: #475569;
+  font-size: 12px;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 18px 0 6px;
+}
+
+.kpiCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 18px rgba(2, 6, 23, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kpiTitle {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+.kpiValue {
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+}
+@media (max-width: 980px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(2, 6, 23, 0.06);
+}
+
+.sectionBody { padding: 16px; }
+
+.summarySpan { grid-column: 1 / -1; }
+
+.searchInput {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+.searchInput:focus {
+  outline: none;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+.tableWrap { overflow: auto; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.table thead th { text-align: left; padding: 12px; background: #f8fafc; color: #475569; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; }
+.table tbody td { padding: 12px; border-top: 1px solid #f1f5f9; color: #334155; }
+.table tbody tr:hover { background: #fafafa; }
