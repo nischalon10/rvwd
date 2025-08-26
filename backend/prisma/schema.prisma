@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for form owners
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  forms     Form[]
+}
+
+// Form model - represents a feedback form
+model Form {
+  id                String    @id @default(cuid())
+  title             String
+  description       String?
+  question          String    // The open-ended question
+  extractionSchema  Json      // JSON schema defining what to extract (scores, sentiment, etc.)
+  uiHints          String[]  // Hints for respondents on what to talk about
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  ownerId           String
+  owner             User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  responses         Response[]
+}
+
+// Response model - represents a voice feedback submission
+model Response {
+  id                String    @id @default(cuid())
+  transcript        String    // The transcribed text from voice
+  extractedData     Json      // JSON data extracted by AI based on schema
+  metadata          Json?     // Additional metadata (audio duration, browser info, etc.)
+  userAgent         String?
+  createdAt         DateTime  @default(now())
+  
+  // Relations
+  formId            String
+  form              Form      @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
