@@ -261,16 +261,67 @@ export default function Login(){
       {/* Modal for creating a new account */}
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h2 style={{marginBottom: 18}}>Create a New Account</h2>
-            <form onSubmit={handleCreateAccount}>
+          <div className="modal-content" style={{
+            borderRadius: 16,
+            padding: '36px 32px 28px 32px',
+            minWidth: 340,
+            boxShadow: '0 8px 32px rgba(2,6,23,0.12)',
+            background: '#fff',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative'
+          }}>
+            {/* X button in top right */}
+            <button
+              onClick={() => setShowModal(false)}
+              disabled={loading}
+              style={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                background: 'transparent',
+                border: 'none',
+                fontSize: 22,
+                fontWeight: 700,
+                color: '#888',
+                cursor: 'pointer',
+                padding: 0,
+                lineHeight: 1,
+              }}
+              aria-label="Close"
+              type="button"
+            >
+              ×
+            </button>
+            <h2 style={{
+              marginBottom: 18,
+              fontWeight: 700,
+              fontSize: 24,
+              letterSpacing: 1,
+              color: '#222'
+            }}>
+              Create a New Account
+            </h2>
+            <form onSubmit={handleCreateAccount} style={{ width: '100%' }}>
               <input
                 type="text"
                 placeholder="Name"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
                 required
-                style={{ marginBottom: 12, width: "100%" }}
+                style={{
+                  marginBottom: 14,
+                  width: "100%",
+                  padding: '14px 14px',
+                  borderRadius: 6,
+                  border: '1.5px solid #e5e7eb',
+                  fontSize: 17,
+                  outline: 'none',
+                  background: '#f9fafb',
+                  fontWeight: 500,
+                  color: '#222'
+                }}
               />
               <input
                 type="email"
@@ -278,28 +329,46 @@ export default function Login(){
                 value={newEmail}
                 onChange={e => setNewEmail(e.target.value)}
                 required
-                style={{ marginBottom: 20, width: "100%" }}
+                style={{
+                  marginBottom: 22,
+                  width: "100%",
+                  padding: '14px 14px',
+                  borderRadius: 6,
+                  border: '1.5px solid #e5e7eb',
+                  fontSize: 17,
+                  outline: 'none',
+                  background: '#f9fafb',
+                  fontWeight: 500,
+                  color: '#222'
+                }}
               />
               <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => setShowModal(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
                 <button
                   type="submit"
                   className="btn secondary"
                   disabled={loading}
+                  style={{
+                    background: '#111',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '12px 28px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer',
+                  }}
                 >
                   {loading ? "Creating..." : "Create"}
                 </button>
               </div>
             </form>
             {message && (
-              <div style={{ marginTop: 16, color: message.startsWith("Error") ? "red" : "green" }}>
+              <div style={{
+                marginTop: 18,
+                color: message.startsWith("Error") ? "#dc2626" : "#16a34a",
+                fontWeight: 600,
+                fontSize: 15
+              }}>
                 {message}
               </div>
             )}
