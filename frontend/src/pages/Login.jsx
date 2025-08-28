@@ -8,6 +8,13 @@ export default function Login(){
   const [pw,setPw] = useState('')
   const { login } = useAuth()
 
+  // Modal state for account creation
+  const [showModal, setShowModal] = useState(false)
+  const [newEmail, setNewEmail] = useState('')
+  const [newName, setNewName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  
   // Animation control
   const [mounted, setMounted] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
@@ -47,7 +54,29 @@ export default function Login(){
     login(email, name.charAt(0).toUpperCase() + name.slice(1))
     nav('/forms')
   }
-
+  // Handler for creating a new account
+  function handleCreateAccount(e) {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+    fetch("http://localhost:3000/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: newEmail, name: newName }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to create account")
+        return res.json()
+      })
+      .then(() => {
+        setMessage("Account created! You can now log in.")
+        setShowModal(false)
+        setNewEmail('')
+        setNewName('')
+      })
+      .catch(() => setMessage("Error creating account."))
+      .finally(() => setLoading(false))
+  }
   return (
     <div
       style={{
@@ -56,7 +85,6 @@ export default function Login(){
         flexDirection:'column',
         justifyContent:'center',
         alignItems:'center',
-        // Subtle professional gradient background
         background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 60%, #f1f5f9 100%)',
       }}
     >
@@ -208,6 +236,7 @@ export default function Login(){
             }}
             onMouseEnter={() => setHoveredSecondary(true)}
             onMouseLeave={() => setHoveredSecondary(false)}
+            onClick={() => setShowModal(true)}
           >
             Create a new account
           </button>
@@ -229,6 +258,54 @@ export default function Login(){
           </button>
         </div>
       </div>
+      {/* Modal for creating a new account */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 style={{marginBottom: 18}}>Create a New Account</h2>
+            <form onSubmit={handleCreateAccount}>
+              <input
+                type="text"
+                placeholder="Name"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                required
+                style={{ marginBottom: 12, width: "100%" }}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                required
+                style={{ marginBottom: 20, width: "100%" }}
+              />
+              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setShowModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn secondary"
+                  disabled={loading}
+                >
+                  {loading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </form>
+            {message && (
+              <div style={{ marginTop: 16, color: message.startsWith("Error") ? "red" : "green" }}>
+                {message}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

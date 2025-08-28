@@ -101,3 +101,20 @@ button{cursor:pointer}
 .toggle:before{content:'';position:absolute;left:4px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:all .2s}
 .toggle:checked:before{left:24px}
 .helper{font-size:12px;color:#777}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px 24px 28px;
+  min-width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
