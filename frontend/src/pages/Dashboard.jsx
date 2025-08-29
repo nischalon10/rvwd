@@ -1,20 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import FormCard from '../components/FormCard';
-import { useForms } from '../context/FormsContext';
 import CreateFormModal from '../components/CreateFormModal';
 import FilterButton from '../components/FilterButton';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
-  const { forms } = useForms();
+  const [forms, setForms] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  // filterMode: 0 = default, 1 = descending, 2 = ascending
   const [filterMode, setFilterMode] = useState(0);
   const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Hardcoded user ID
+  const userId = "cmex0wtkk0000it1k983w7v9v";
 
   // Motion preferences
   const [mounted, setMounted] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/forms?ownerId=${userId}`)
+      .then(res => res.json())
+      .then(data => setForms(data))
+      .catch(() => setForms([]))
+      .finally(() => setLoading(false));
+  }, [showModal, userId]); // refetch when modal closes (new form added)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'matchMedia' in window) {
@@ -40,7 +50,7 @@ export default function Dashboard() {
     if (!q) return forms;
     return forms.filter(f =>
       (f.title && f.title.toLowerCase().includes(q)) ||
-      (f.snippet && f.snippet.toLowerCase().includes(q))
+      (f.description && f.description.toLowerCase().includes(q))
     );
   }, [forms, query]);
 
@@ -69,9 +79,7 @@ export default function Dashboard() {
 
   return (
     <div className={styles['dashboard-bg']}>
-      {/* Content container */}
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Header card */}
         <div
           className={styles.glass}
           style={{
@@ -116,10 +124,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Grid of forms */}
-        {displayedForms.length > 0 ? (
+        {loading ? (
+          <div style={{ padding: 32, textAlign: 'center' }}>Loading...</div>
+        ) : displayedForms.length > 0 ? (
           <div
-            // Override grid to a responsive, professional layout
             className="grid-3"
             style={{
               display: 'grid',
