@@ -160,7 +160,7 @@ export default function Login(){
               type="email"
               className="input"
               style={{fontSize:18, padding:'18px 18px', transition: 'box-shadow 240ms ease, transform 240ms ease'}}
-              placeholder="Value"
+              placeholder="Enter your email"
               value={email}
               onChange={e=>setEmail(e.target.value)}
               required
@@ -176,7 +176,7 @@ export default function Login(){
               type="password"
               className="input"
               style={{fontSize:18, padding:'18px 18px', transition: 'box-shadow 240ms ease, transform 240ms ease'}}
-              placeholder="Value"
+              placeholder="Enter your password"
               value={pw}
               onChange={e=>setPw(e.target.value)}
               required
@@ -250,6 +250,9 @@ export default function Login(){
               boxShadow: hoveredGhost ? '0 8px 20px rgba(2, 6, 23, 0.08)' : 'none',
               transition: reduceMotion ? 'none' : 'transform 200ms ease, box-shadow 200ms ease',
               willChange: 'transform',
+            }}
+            onClick={() => {
+                window.open('http://localhost:3000/auth/google', '_self');
             }}
             onMouseEnter={() => setHoveredGhost(true)}
             onMouseLeave={() => setHoveredGhost(false)}
