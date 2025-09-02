@@ -85,9 +85,9 @@ export default function FormCard({ form }){
           textDecoration: 'none',
           boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
         }}
-        title="Share"
-        aria-label="Share form"
-      >Share</Link>
+        title="Record"
+        aria-label="Record form"
+      >Record</Link>
       <div className="h3" style={{
         marginTop: 0,
         marginBottom: 8,
@@ -116,7 +116,6 @@ export default function FormCard({ form }){
   {/* Description is now only in the row with the score */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', flexShrink: 0, marginTop: 8}}>
         <div style={{fontSize:13, color:'#666', textAlign:'left', marginRight: 16}}>
-          <span style={{fontWeight:600}}>Date Created:</span>{' '}
           <span>{form.createdAt ? new Date(form.createdAt).toLocaleDateString() : 'N/A'}</span>
         </div>
   {/* View Responses button removed; card itself is now clickable */}
