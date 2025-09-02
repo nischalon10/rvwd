@@ -27,7 +27,10 @@ rvwd is a universal, lightweight feedback platform that turns scattered comments
 # 1) Install dependencies
 npm install
 
-# 2) Start the dev server
+# 2) Install speech-to-text library for React
+npm install react-speech-recognition
+
+# 3) Start the dev server
 npm run dev
 
 ```
