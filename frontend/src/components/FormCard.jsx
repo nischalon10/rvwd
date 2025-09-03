@@ -73,6 +73,7 @@ export default function FormCard({ form }){
   <Link to={`/forms/${form.id}`} className="card" style={{display:'flex',flexDirection:'column',alignItems:'stretch',gap:12,position:'relative',height:'100%', textDecoration:'none', color:'inherit', cursor:'pointer'}}>
       <Link
         to={`/share/${form.id}`}
+        state={{ question: form.question }}
         onClick={e => e.stopPropagation()}
         style={{
           position: 'absolute',
