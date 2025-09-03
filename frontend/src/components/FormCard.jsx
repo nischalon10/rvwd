@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForms } from '../context/FormsContext'
 
 function getScoreColor(value) {
@@ -61,8 +61,13 @@ function Donut({ value }) {
 
 export default function FormCard({ form }){
   const { forms, setForms } = useForms();
+  const navigate = useNavigate();
   function handleDelete() {
     setForms(forms.filter(f => f.id !== form.id));
+  }
+  function handleShare(e) {
+    e.stopPropagation();
+    navigate(`/share/${form.id}`);
   }
   return (
   <Link to={`/forms/${form.id}`} className="card" style={{display:'flex',flexDirection:'column',alignItems:'stretch',gap:12,position:'relative',height:'100%', textDecoration:'none', color:'inherit', cursor:'pointer'}}>
@@ -113,13 +118,32 @@ export default function FormCard({ form }){
           <p style={{margin:0}}>{form.snippet}</p>
         </div>
       </div>
-  {/* Description is now only in the row with the score */}
+      {/* Bottom row with Date Created and Share button */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', flexShrink: 0, marginTop: 8}}>
         <div style={{fontSize:13, color:'#666', textAlign:'left', marginRight: 16}}>
           <span>{form.createdAt ? new Date(form.createdAt).toLocaleDateString() : 'N/A'}</span>
         </div>
-  {/* View Responses button removed; card itself is now clickable */}
+        <button
+          onClick={handleShare}
+          style={{
+            padding: '6px 18px',
+            border: 'none',
+            borderRadius: '16px',
+            background: '#1976d2',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: 13,
+            cursor: 'pointer',
+            zIndex: 2,
+            textDecoration: 'none',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
+          }}
+          title="Share"
+          aria-label="Share this form"
+        >
+          Share
+        </button>
       </div>
-  </Link>
-  )
+    </Link>
+  );
 }
