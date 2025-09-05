@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function CreateFormModal({ onClose }) {
   const [title, setTitle] = useState('');
@@ -15,7 +16,8 @@ export default function CreateFormModal({ onClose }) {
     suggestions: { type: "string" }
   };
   const uiHints = ["Rate usability 1-10", "Mention specific features"];
-  const ownerId = "cmex0wtkk0000it1k983w7v9v"; // hardcoded user ID
+  const { user } = useAuth();
+  const ownerId = (user && user.userId) || localStorage.getItem('userId');
 
   function handleSubmit(e) {
     e.preventDefault();

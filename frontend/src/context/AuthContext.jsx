@@ -9,12 +9,18 @@ export function AuthProvider({ children }) {
     setUser(userObj);
   }
 
+  function setUserId(userId) {
+    setUser(prev => prev ? { ...prev, userId } : prev);
+    localStorage.setItem('userId', userId);
+  }
+
   function logout() {
     setUser(null);
+    localStorage.removeItem('userId');
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, setUserId }}>
       {children}
     </AuthContext.Provider>
   );

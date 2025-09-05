@@ -3,6 +3,7 @@ import FormCard from '../components/FormCard';
 import CreateFormModal from '../components/CreateFormModal';
 import FilterButton from '../components/FilterButton';
 import styles from './Dashboard.module.css';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
   const [forms, setForms] = useState([]);
@@ -11,8 +12,8 @@ export default function Dashboard() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Hardcoded user ID
-  const userId = "cmex0wtkk0000it1k983w7v9v";
+  const { user } = useAuth();
+  const userId = (user && user.userId) || localStorage.getItem('userId');
 
   // Motion preferences
   const [mounted, setMounted] = useState(false);

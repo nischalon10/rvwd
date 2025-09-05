@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 export default function App() {
   const location = useLocation();
-  const { login } = useAuth() || {};
+  const { login, setUserId } = useAuth() || {};
 
   // Only set user if redirected from Google OAuth (with name & email in URL)
   useEffect(() => {
@@ -19,9 +19,23 @@ export default function App() {
     const email = params.get('email');
     if (name && email) {
       login({ name, email });
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Fetch userId from backend
+      fetch('http://localhost:3000/users/find-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.userId) {
+            localStorage.setItem('userId', data.userId);
+            if (typeof setUserId === 'function') setUserId(data.userId);
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch(() => window.history.replaceState({}, document.title, window.location.pathname));
     }
-  }, [login]);
+  }, [login, setUserId]);
 
   return (
     <div>

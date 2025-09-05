@@ -1,0 +1,12 @@
+import { Controller, Post, Body } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post('find-id')
+  async getUserIdByEmail(@Body('email') email: string) {
+    return this.usersService.findIdByEmail(email);
+  }
+}
