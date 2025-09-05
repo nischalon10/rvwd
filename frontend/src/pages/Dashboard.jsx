@@ -103,38 +103,25 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div className="row" style={{ gap: 8, alignItems: 'center' }}>
-              <input
-                className="input"
-                type="search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search forms..."
-                aria-label="Search forms"
-                style={{
-                  minWidth: 220,
-                  background: 'rgba(255,255,255,0.9)',
-                  borderColor: 'rgba(255,255,255,0.35)',
-                }}
-              />
-            </div>
             <FilterButton onClick={handleFilterClick} />
             <button className={styles['create-btn']} onClick={() => setShowModal(true)}>
-              Create New Form
+              +
             </button>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: 32, textAlign: 'center' }}>Loading...</div>
+          <div style={{textAlign: 'center' }}>Loading...</div>
         ) : displayedForms.length > 0 ? (
           <div
             className="grid-3"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 20,
+              gap: 32, 
+              padding: 32, 
               alignItems: 'stretch',
+              boxSizing: 'border-box'
             }}
           >
             {displayedForms.map((f, idx) => (

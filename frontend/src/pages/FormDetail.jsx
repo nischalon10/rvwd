@@ -1,11 +1,15 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Accordion from '../components/Accordion'
 import { latestReviews, sampleSummary } from '../mockData'
 import styles from './FormDetail.module.css'
+import { useForms } from '../context/FormsContext'
 
 export default function FormDetail() {
   const nav = useNavigate()
+  const { id } = useParams();
+  const { forms } = useForms();
+  const form = forms?.find(f => String(f.id) === String(id)) || {};
 
   // Basic KPIs derived from mock data (can wire to real data later)
   const kpis = useMemo(() => ([
@@ -27,10 +31,29 @@ export default function FormDetail() {
               </button>
               <div>
                 <div className={styles.title}>Latest reviews</div>
-                <div className={styles.meta}>Reviews • Analysis • Controls</div>
               </div>
+              <Link
+                to={`/share/${form.id}`}
+                state={{ question: form.question }}
+                onClick={e => e.stopPropagation()}
+                style={{
+                  marginLeft: 16,
+                  padding: '4px 16px',
+                  border: 'none',
+                  borderRadius: '16px',
+                  background: '#1976d2',
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  zIndex: 2,
+                  textDecoration: 'none',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
+                }}
+                title="Record"
+                aria-label="Record form"
+              >Record</Link>
             </div>
-
             <div className={styles.actions}>
               <div className={styles.meta}>Live</div>
               <input id="toggle" type="checkbox" className="toggle" />
