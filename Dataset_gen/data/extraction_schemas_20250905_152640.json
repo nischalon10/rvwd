@@ -1,0 +1,640 @@
+[
+  {
+    "business_type": "App",
+    "schema_name": "App Usability Study",
+    "extractionSchema": {
+      "usabilityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "painPoints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "University",
+    "schema_name": "Course Evaluation",
+    "extractionSchema": {
+      "teachingQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "curriculumContentScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "ClarityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "EngagementScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "Satisfaction": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "improvementAreas": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "strengths": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "retail_store",
+    "schema_name": "Retail Customer Experience",
+    "extractionSchema": {
+      "productAvailabilityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "staffHelpfulnessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "storeOrganizationScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "checkoutExperienceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "valuePerceptionScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "complaints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "healthcare",
+    "schema_name": "Healthcare Service Assessment",
+    "extractionSchema": {
+      "medicalCareScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "staffProfessionalismScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "waitTimeScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "CleanlinessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "concerns": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "hotel",
+    "schema_name": "Hotel Experience Evaluation",
+    "extractionSchema": {
+      "roomQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "serviceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "amenitiesScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "locationScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "valueScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "issues": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "highlights": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "gym",
+    "schema_name": "Fitness Center Assessment",
+    "extractionSchema": {
+      "equipmentQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "cleanlinessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "staffHelpfulnessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "atmosphereScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "valueScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "complaints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "positiveAspects": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "salon",
+    "schema_name": "Beauty Salon Experience",
+    "extractionSchema": {
+      "serviceQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "stylistSkillScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "cleanlinessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "customerServiceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "valueScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "issues": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "compliments": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "car_dealership",
+    "schema_name": "Automotive Sales Experience",
+    "extractionSchema": {
+      "salesProcessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "staffKnowledgeScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "vehicleQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "pricingTransparencyScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "overallExperienceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "concerns": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "positiveHighlights": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "online_service",
+    "schema_name": "Digital Platform Usability",
+    "extractionSchema": {
+      "usabilityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "performanceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "designScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "functionalityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "valueScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "painPoints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "positiveFeatures": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "Hotel",
+    "schema_name": "Hotel Stay Experience",
+    "extractionSchema": {
+      "overallSatisfaction": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "cleanlinessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "issuesEncountered": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "amenitiesLiked": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "Gym",
+    "schema_name": "Fitness Center Feedback",
+    "extractionSchema": {
+      "equipmentQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "cleanlinessScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "painPoints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "positiveFeedback": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "Salon",
+    "schema_name": "Hair Salon Experience",
+    "extractionSchema": {
+      "stylistSkillRating": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "customerServiceRating": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "issuesFaced": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "preferredServices": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "CarDealership",
+    "schema_name": "Auto Dealership Feedback",
+    "extractionSchema": {
+      "salesExperienceScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "serviceQualityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "customerComplaints": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "vehicleSelectionLiked": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "business_type": "OnlineService",
+    "schema_name": "E-commerce Platform Feedback",
+    "extractionSchema": {
+      "websiteUsabilityScore": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "customerSupportRating": {
+        "type": "number",
+        "min": 1,
+        "max": 10
+      },
+      "sentiment": {
+        "type": "string",
+        "enum": [
+          "positive",
+          "negative",
+          "neutral"
+        ]
+      },
+      "bugsReported": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "bestFeatures": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "suggestions": {
+        "type": "string"
+      }
+    }
+  }
+]
