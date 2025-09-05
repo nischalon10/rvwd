@@ -60,9 +60,11 @@ export default function Login(){
     })
       .then(res => res.json())
       .then(data => {
-        if (data && data.userId) {
-          localStorage.setItem('userId', data.userId);
-          if (typeof setUserId === 'function') setUserId(data.userId);
+        console.log('find-id response', data);
+        if (data && (data.userId || data.id)) {
+          const id = data.userId || data.id;
+          localStorage.setItem('userId', id);
+          if (typeof setUserId === 'function') setUserId(id);
         }
         nav('/forms');
       })

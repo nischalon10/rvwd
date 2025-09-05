@@ -7,6 +7,6 @@ export class UsersService {
 
   async findIdByEmail(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    return user ? { id: user.id } : { error: 'User not found' };
+    return user ? { userId: user.id } : { error: 'User not found' };
   }
 }

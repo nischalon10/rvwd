@@ -23,6 +23,11 @@ export default function CreateFormModal({ onClose }) {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    if (!ownerId) {
+    setMessage('User ID missing. Please log in again.');
+    setLoading(false);
+    return;
+    }
     const body = {
       title,
       description,
