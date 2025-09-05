@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Accordion from '../components/Accordion'
 import { latestReviews, sampleSummary } from '../mockData'
@@ -9,7 +9,29 @@ export default function FormDetail() {
   const nav = useNavigate()
   const { id } = useParams();
   const { forms } = useForms();
-  const form = forms?.find(f => String(f.id) === String(id)) || {};
+  // Try to get form from context first; if not present, fetch from backend
+  const ctxForm = forms?.find(f => String(f.id) === String(id));
+  const [form, setForm] = useState(ctxForm || {});
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadForm() {
+      if (ctxForm) {
+        setForm(ctxForm);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:3000/forms/${id}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!cancelled) setForm(json);
+      } catch (err) {
+        // ignore; form stays empty
+      }
+    }
+    loadForm();
+    return () => { cancelled = true };
+  }, [id, ctxForm])
 
   // Basic KPIs derived from mock data (can wire to real data later)
   const kpis = useMemo(() => ([
@@ -33,7 +55,7 @@ export default function FormDetail() {
                 <div className={styles.title}>Latest reviews</div>
               </div>
               <Link
-                to={`/share/${form.id}`}
+                to={`/share/${form.id || id}`}
                 state={{ question: form.question }}
                 onClick={e => e.stopPropagation()}
                 style={{

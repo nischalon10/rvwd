@@ -6,12 +6,25 @@ export default function SharePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Resolve form id robustly
+  const resolvedFormId = (() => {
+    if (id && id !== 'undefined') return id;
+    if (location.state?.formId) return location.state.formId;
+    if (location.state?.id) return location.state.id;
+    const q = new URLSearchParams(location.search).get('id');
+    if (q) return q;
+    return undefined;
+  })();
+
   const question = location.state?.question || 'No question provided.';
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [formValid, setFormValid] = useState(true);
+  const [checkingForm, setCheckingForm] = useState(true);
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -23,14 +36,55 @@ export default function SharePage() {
   useEffect(() => {
     let timer;
     if (recording) {
-      timer = setInterval(() => {
-        setSeconds((s) => s + 1);
-      }, 1000);
+      timer = setInterval(() => setSeconds(s => s + 1), 1000);
     } else {
       setSeconds(0);
     }
     return () => clearInterval(timer);
   }, [recording]);
+
+  // Verify form exists and is active
+  useEffect(() => {
+    let cancelled = false;
+    async function checkForm() {
+      setCheckingForm(true);
+      if (!resolvedFormId) {
+        setFormValid(false);
+        setStatusMessage('Invalid form ID.');
+        setCheckingForm(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3000/forms/${resolvedFormId}`);
+        if (!res.ok) {
+          const text = await res.text();
+          setFormValid(false);
+          setStatusMessage(text || 'Form not found');
+        } else {
+          const json = await res.json();
+          if (!cancelled) {
+            if (!json || json.isActive === false) {
+              setFormValid(false);
+              setStatusMessage('This form is not accepting responses.');
+            } else {
+              setFormValid(true);
+              setStatusMessage('');
+            }
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setFormValid(false);
+          setStatusMessage('Unable to verify form. Is the backend running?');
+        }
+      } finally {
+        if (!cancelled) setCheckingForm(false);
+      }
+    }
+    checkForm();
+    return () => { cancelled = true };
+  }, [resolvedFormId]);
 
   if (!browserSupportsSpeechRecognition) {
     return (
@@ -69,10 +123,19 @@ export default function SharePage() {
   };
 
   const handleSubmit = async () => {
+    if (!resolvedFormId) {
+      setStatusMessage('Invalid form id — cannot submit.');
+      return;
+    }
     if (!transcript) {
       setStatusMessage('Please record your response before submitting.');
       return;
     }
+    if (!formValid) {
+      setStatusMessage('Cannot submit: invalid form.');
+      return;
+    }
+
     setSubmitting(true);
     setStatusMessage('Submitting response...');
 
@@ -86,17 +149,17 @@ export default function SharePage() {
       const res = await fetch('http://localhost:3000/responses/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formId: id, transcript, metadata }),
+        body: JSON.stringify({ formId: resolvedFormId, transcript, metadata }),
       });
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || 'Server returned an error');
+        throw new Error(text || `Server returned ${res.status}`);
       }
       setStatusMessage('Response submitted successfully. Redirecting...');
       setTimeout(() => navigate('/forms'), 900);
     } catch (err) {
       console.error(err);
-      setStatusMessage('Failed to submit response. Please try again.');
+      setStatusMessage(err?.message || 'Failed to submit response. Please try again.');
     } finally {
       if (mounted.current) setSubmitting(false);
     }
@@ -141,8 +204,8 @@ export default function SharePage() {
             </div>
 
             <div style={{display:'flex',gap:12,alignItems:'center'}}>
-              <div style={{fontSize:13,color:recording ? '#dc2626' : '#374151',fontWeight:600}}>{recording ? 'Recording' : 'Ready'}</div>
-              <div style={{height:6,width:6,borderRadius:6,background:recording ? '#dc2626' : '#c7d2fe'}} />
+              <div style={{fontSize:13,color:recording ? '#dc2626' : '#374151',fontWeight:600}}>{recording ? 'Recording' : checkingForm ? 'Checking form...' : formValid ? 'Ready' : 'Invalid form'}</div>
+              <div style={{height:6,width:6,borderRadius:6,background:recording ? '#dc2626' : formValid ? '#c7d2fe' : '#fca5a5'}} />
               <div style={{color:'#6b7280',fontSize:13,fontFeatureSettings:'"tnum"',fontVariantNumeric:'tabular-nums'}}>{formatTime(seconds)}</div>
             </div>
 
@@ -159,7 +222,7 @@ export default function SharePage() {
 
           <div style={{display:'flex',gap:12,marginTop:12}}>
             <button onClick={handleRetry} style={{flex:1,padding:'10px 12px',borderRadius:8,border:'1px solid #e6eef9',background:'#fff',color:'#0b1220',fontWeight:600,cursor:'pointer'}}>Retry</button>
-            <button onClick={handleSubmit} disabled={submitting} style={{flex:1,padding:'10px 12px',borderRadius:8,border:'none',background:'#0b74ff',color:'#fff',fontWeight:700,cursor:'pointer',boxShadow:'0 6px 18px rgba(11,116,255,0.12)'}}>{submitting ? 'Submitting...' : 'Submit'}</button>
+            <button onClick={handleSubmit} disabled={submitting || !formValid} style={{flex:1,padding:'10px 12px',borderRadius:8,border:'none',background: !formValid ? '#9ca3af' : '#0b74ff',color:'#fff',fontWeight:700,cursor: !formValid ? 'not-allowed' : 'pointer',boxShadow:'0 6px 18px rgba(11,116,255,0.12)'}}>{submitting ? 'Submitting...' : 'Submit'}</button>
           </div>
 
           {statusMessage && <div style={{marginTop:10,color:'#374151',fontSize:13}}>{statusMessage}</div>}
