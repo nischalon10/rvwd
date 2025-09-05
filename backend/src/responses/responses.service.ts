@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { OpenAIService } from '../openai/openai.service';
 import {
   CreateResponseDto,
   ResponseDto,
@@ -12,7 +13,10 @@ import {
 
 @Injectable()
 export class ResponsesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private openAIService: OpenAIService,
+  ) {}
 
   async submitResponse(
     createResponseDto: CreateResponseDto,
@@ -36,25 +40,43 @@ export class ResponsesService {
       );
     }
 
-    // For now, create a mock extracted data (we'll add AI processing later)
-    const mockExtractedData = {
-      processed: true,
-      timestamp: new Date().toISOString(),
-      wordCount: createResponseDto.transcript.split(' ').length,
-      // In real implementation, this will be AI-extracted based on form.extractionSchema
-      mockData: {
-        sentiment: 'neutral',
-        keyTopics: ['product', 'feedback'],
-        score: Math.floor(Math.random() * 10) + 1, // Random score for testing
-      },
-    };
+    // Process the transcript through OpenAI
+    let extractedData: Record<string, any>;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      extractedData = await this.openAIService.extractDataFromTranscript({
+        transcript: createResponseDto.transcript,
+        formId: form.id,
+        formTitle: form.title,
+        formQuestion: form.question,
+        extractionSchema: form.extractionSchema,
+      });
+
+      // Add processing metadata
+      extractedData = {
+        ...extractedData,
+        processedAt: new Date().toISOString(),
+        wordCount: createResponseDto.transcript.split(' ').length,
+        aiProcessed: true,
+      };
+    } catch (error) {
+      // If OpenAI processing fails, log the error and continue with fallback
+      console.error('OpenAI processing failed:', error);
+      extractedData = {
+        processed: false,
+        error: 'AI processing failed',
+        timestamp: new Date().toISOString(),
+        wordCount: createResponseDto.transcript.split(' ').length,
+        fallback: true,
+      };
+    }
 
     // Create the response record
     const response = await this.prisma.response.create({
       data: {
         formId: createResponseDto.formId,
         transcript: createResponseDto.transcript,
-        extractedData: mockExtractedData,
+        extractedData: extractedData,
         metadata: createResponseDto.metadata || {},
         userAgent: createResponseDto.userAgent,
       },

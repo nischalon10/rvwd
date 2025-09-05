@@ -16,7 +16,6 @@ export class ResponsesController {
     @Body() createResponseDto: CreateResponseDto,
     @Req() req: Request,
   ): Promise<SubmitResponseResponseDto> {
-    // Add user agent from request (removed IP address)
     const enrichedDto = {
       ...createResponseDto,
       userAgent: req.get('User-Agent'),
