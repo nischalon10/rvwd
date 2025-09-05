@@ -53,7 +53,32 @@ export default function SharePage() {
       </div>
       <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
         <button onClick={handleRetry} style={{ width: 140, height: 28, borderRadius: 6, border: '1px solid #bbb', background: '#f6f6f6', color: '#222', fontSize: 15, cursor: 'pointer' }}>Retry</button>
-        <button style={{ width: 140, height: 28, borderRadius: 6, border: 'none', background: '#222', color: '#fff', fontSize: 15, cursor: 'pointer' }}>Submit</button>
+        <button
+          style={{ width: 140, height: 28, borderRadius: 6, border: 'none', background: '#222', color: '#fff', fontSize: 15, cursor: 'pointer' }}
+          onClick={async () => {
+            if (!transcript) {
+              alert('Please record your response before submitting.');
+              return;
+            }
+            const metadata = {
+              browser: navigator.userAgent,
+              timestamp: new Date().toISOString(),
+            };
+            await fetch('http://localhost:3000/responses/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                formId: id,
+                transcript,
+                metadata,
+              }),
+            });
+            alert('Response submitted!');
+            navigate('/forms');
+          }}
+        >
+          Submit
+        </button>
       </div>
     </div>
   );
