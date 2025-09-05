@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useSearch } from '../context/SearchContext'
 
 export default function Navbar(){
   const { pathname } = useLocation()
   const isDashboard = pathname === '/forms'
   const { user, logout } = useAuth()
+  const { query, setQuery } = useSearch();
 
   if (pathname === '/' || pathname === '/login') {
     return null
@@ -68,7 +70,9 @@ export default function Navbar(){
               </span>
               <input
                 type="text"
-                placeholder="Search forms..."
+                placeholder="Search"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '10px 28px 10px 48px', // left padding for icon
@@ -80,9 +84,34 @@ export default function Navbar(){
                   textAlign: 'left',
                   boxSizing: 'border-box'
                 }}
-                // If you want to control the search value, pass value/onChange as props
-                readOnly
               />
+              {/* Clear (X) button */}
+              {query && query.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  aria-label="Clear search"
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    background: 'transparent',
+                    padding: 6,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#666'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -147,3 +176,5 @@ export default function Navbar(){
     </div>
   )
 }
+
+

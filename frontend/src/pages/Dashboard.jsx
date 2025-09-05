@@ -4,16 +4,18 @@ import CreateFormModal from '../components/CreateFormModal';
 import FilterButton from '../components/FilterButton';
 import styles from './Dashboard.module.css';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext'
 
 export default function Dashboard() {
   const [forms, setForms] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [filterMode, setFilterMode] = useState(0);
-  const [query, setQuery] = useState('');
+  const { query } = useSearch(); // read only here
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
   const userId = (user && user.userId) || localStorage.getItem('userId');
+
 
   // Motion preferences
   const [mounted, setMounted] = useState(false);
@@ -56,14 +58,15 @@ export default function Dashboard() {
   }, [forms, query]);
 
   const displayedForms = useMemo(() => {
-    let list = filtered;
-    if (filterMode === 1) {
-      list = [...filtered].sort((a, b) => b.score - a.score);
-    } else if (filterMode === 2) {
-      list = [...filtered].sort((a, b) => a.score - b.score);
-    }
-    return list;
-  }, [filtered, filterMode]);
+    const q = (query || '').trim().toLowerCase()
+    if (!q) return forms
+    return forms.filter(f => {
+      const title = (f.title || '').toLowerCase()
+      const question = (f.question || '').toLowerCase()
+      const description = (f.description || '').toLowerCase()
+      return title.includes(q) || question.includes(q) || description.includes(q)
+    })
+  }, [forms, query])
 
   const averageScore = useMemo(() => {
     if (!forms.length) return '-';
@@ -111,7 +114,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div style={{textAlign: 'center' }}>Loading...</div>
+          <div style={{ padding: 32, textAlign: 'center' }}>Loading...</div>
         ) : displayedForms.length > 0 ? (
           <div
             className="grid-3"
