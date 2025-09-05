@@ -6,7 +6,7 @@ export default function Login(){
   const nav = useNavigate()
   const [email,setEmail] = useState('')
   const [pw,setPw] = useState('')
-  const { login } = useAuth()
+  const { login, setUserId } = useAuth()
 
   // Modal state for account creation
   const [showModal, setShowModal] = useState(false)
@@ -48,11 +48,27 @@ export default function Login(){
   const transitionBase = reduceMotion ? 'none' : `transform 600ms ${EASE}, opacity 600ms ${EASE}, filter 600ms ${EASE}, box-shadow 300ms ${EASE}`
 
   function handleSubmit(e){
-    e.preventDefault()
+    e.preventDefault();
     // Use email as name if no name is provided
-    const name = email.split('@')[0].replace(/\W/g, ' ')
-    login(email, name.charAt(0).toUpperCase() + name.slice(1))
-    nav('/forms')
+    const name = email.split('@')[0].replace(/\W/g, ' ');
+    login({ name: name.charAt(0).toUpperCase() + name.slice(1), email });
+    // Fetch userId from backend
+    fetch('http://localhost:3000/users/find-id', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('find-id response', data);
+        if (data && (data.userId || data.id)) {
+          const id = data.userId || data.id;
+          localStorage.setItem('userId', id);
+          if (typeof setUserId === 'function') setUserId(id);
+        }
+        nav('/forms');
+      })
+      .catch(() => nav('/forms'));
   }
   // Handler for creating a new account
   function handleCreateAccount(e) {

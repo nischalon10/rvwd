@@ -4,19 +4,11 @@ import { useAuth } from '../context/AuthContext'
 
 export default function Navbar(){
   const { pathname } = useLocation()
-  // Hide on login page
+  const isDashboard = pathname === '/forms'
   const { user, logout } = useAuth()
+
   if (pathname === '/' || pathname === '/login') {
-    return (
-      <div className="nav">
-        <div style={{display:'flex', alignItems:'center', height:56, minHeight:56, gap:16, width:'100%'}}>
-          <div style={{color: '#111', fontWeight: 700, fontSize: 28, letterSpacing: 2, padding: '0 32px 0 24px'}}>
-            <Link to="/forms" style={{color:'#111', textDecoration:'none'}}>rvwd</Link>
-          </div>
-          <div className="spacer" />
-        </div>
-      </div>
-    )
+    return null
   }
 
   // Dropdown state and outside click handler
@@ -34,11 +26,69 @@ export default function Navbar(){
 
   return (
     <div className="nav">
-      <div style={{display:'flex', alignItems:'center', height:56, minHeight:56, gap:16, width:'100%'}}>
-        <div style={{color: '#111', fontWeight: 700, fontSize: 28, letterSpacing: 2, padding: '0 32px 0 24px'}}>
+      <div style={{
+        display:'flex',
+        alignItems:'center',
+        height:56,
+        minHeight:56,
+        gap:16,
+        width:'100%'
+      }}>
+        <div style={{
+          color: '#111',
+          fontWeight: 700,
+          fontSize: 28,
+          letterSpacing: 2,
+          padding: '0 32px 0 24px'
+        }}>
           <Link to="/forms" style={{color:'#111', textDecoration:'none'}}>rvwd</Link>
         </div>
-        <div className="spacer" />
+        {/* Centered search bar only on dashboard */}
+        {isDashboard && (
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: 820 }}>
+              <span
+                style={{
+                  position: 'absolute',
+                  left: 18,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#aaa',
+                  fontSize: 22,
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                {/* Search icon SVG */}
+                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                placeholder="Search forms..."
+                style={{
+                  width: '100%',
+                  padding: '10px 28px 10px 48px', // left padding for icon
+                  borderRadius: 8,
+                  border: '1px solid #eee',
+                  background: '#f7f7fa',
+                  fontSize: 17,
+                  marginRight: 0,
+                  textAlign: 'left',
+                  boxSizing: 'border-box'
+                }}
+                // If you want to control the search value, pass value/onChange as props
+                readOnly
+              />
+            </div>
+          </div>
+        )}
+        {/* Spacer to push account to right if search bar is not shown */}
+        {!isDashboard && <div style={{ flex: 1 }} />}
+        {/* Account dropdown always on the right */}
         {user && (
           <div style={{position:'relative', marginRight:24}} ref={dropdownRef}>
             <button className="btn secondary" style={{fontWeight:600, color:'#222', fontSize:16, display:'flex', alignItems:'center', gap:8, padding:'8px 16px'}} onClick={()=>setOpen(v=>!v)}>

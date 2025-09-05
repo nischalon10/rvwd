@@ -3,6 +3,7 @@ import FormCard from '../components/FormCard';
 import CreateFormModal from '../components/CreateFormModal';
 import FilterButton from '../components/FilterButton';
 import styles from './Dashboard.module.css';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
   const [forms, setForms] = useState([]);
@@ -11,8 +12,8 @@ export default function Dashboard() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Hardcoded user ID
-  const userId = "cmex0wtkk0000it1k983w7v9v";
+  const { user } = useAuth();
+  const userId = (user && user.userId) || localStorage.getItem('userId');
 
   // Motion preferences
   const [mounted, setMounted] = useState(false);
@@ -102,38 +103,25 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div className="row" style={{ gap: 8, alignItems: 'center' }}>
-              <input
-                className="input"
-                type="search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search forms..."
-                aria-label="Search forms"
-                style={{
-                  minWidth: 220,
-                  background: 'rgba(255,255,255,0.9)',
-                  borderColor: 'rgba(255,255,255,0.35)',
-                }}
-              />
-            </div>
             <FilterButton onClick={handleFilterClick} />
             <button className={styles['create-btn']} onClick={() => setShowModal(true)}>
-              Create New Form
+              +
             </button>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: 32, textAlign: 'center' }}>Loading...</div>
+          <div style={{textAlign: 'center' }}>Loading...</div>
         ) : displayedForms.length > 0 ? (
           <div
             className="grid-3"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 20,
+              gap: 32, 
+              padding: 32, 
               alignItems: 'stretch',
+              boxSizing: 'border-box'
             }}
           >
             {displayedForms.map((f, idx) => (

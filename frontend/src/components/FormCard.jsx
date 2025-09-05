@@ -70,30 +70,24 @@ export default function FormCard({ form }){
     navigate(`/share/${form.id}`);
   }
   return (
-  <Link to={`/forms/${form.id}`} className="card" style={{display:'flex',flexDirection:'column',alignItems:'stretch',gap:12,position:'relative',height:'100%', textDecoration:'none', color:'inherit', cursor:'pointer'}}>
-      <Link
-        to={`/share/${form.id}`}
-        state={{ question: form.question }}
-        onClick={e => e.stopPropagation()}
-        style={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          padding: '4px 12px',
-          border: 'none',
-          borderRadius: '16px',
-          background: '#1976d2',
-          color: '#fff',
-          fontWeight: 'bold',
-          fontSize: 13,
-          cursor: 'pointer',
-          zIndex: 2,
-          textDecoration: 'none',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
-        }}
-        title="Record"
-        aria-label="Record form"
-      >Record</Link>
+  <Link to={`/forms/${form.id}`}
+    className="card"
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: 12,
+      position: 'relative',
+      height: 280,        
+      width: 280,         
+      minWidth: 220,      
+      maxWidth: 320,      
+      textDecoration: 'none',
+      color: 'inherit',
+      cursor: 'pointer',
+      boxSizing: 'border-box'
+    }}
+  >
       <div className="h3" style={{
         marginTop: 0,
         marginBottom: 8,
@@ -111,18 +105,30 @@ export default function FormCard({ form }){
       }}>
         {form.title}
       </div>
-      <div style={{display:'flex', flexDirection:'row', alignItems:'stretch', gap:16, marginBottom:8, flex:1}}>
-        <div style={{flexShrink:0, display:'flex', alignItems:'center'}}>
+      <div style={{display:'flex', flexDirection:'column', alignItems:'stretch', gap:16, marginBottom:8, flex:1}}>
+        {/* <div style={{flexShrink:0, display:'flex', alignItems:'center'}}>
           <Donut value={form.score} />
+        </div> */}
+        <div style={{flex:1, maxWidth:'100%', overflow:'auto', display:'flex', alignItems:'center'}}>
+          <p style={{margin:0}}>{form.question}</p>
         </div>
         <div style={{flex:1, maxWidth:'100%', overflow:'auto', display:'flex', alignItems:'center'}}>
-          <p style={{margin:0}}>{form.snippet}</p>
+          <p style={{margin:0}}>{form.description}</p>
         </div>
+
       </div>
       {/* Bottom row with Date Created and Share button */}
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', flexShrink: 0, marginTop: 8}}>
         <div style={{fontSize:13, color:'#666', textAlign:'left', marginRight: 16}}>
-          <span>{form.createdAt ? new Date(form.createdAt).toLocaleDateString() : 'N/A'}</span>
+          <span>
+            {form.createdAt
+              ? new Date(form.createdAt).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                }) // "Sep 5 2025"
+              : 'N/A'}
+          </span>
         </div>
         <button
           onClick={handleShare}
