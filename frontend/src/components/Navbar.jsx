@@ -75,7 +75,7 @@ export default function Navbar(){
                 onChange={e => setQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '10px 28px 10px 48px', // left padding for icon
+                  padding: '10px 28px 10px 48px', 
                   borderRadius: 8,
                   border: '1px solid #eee',
                   background: '#f7f7fa',

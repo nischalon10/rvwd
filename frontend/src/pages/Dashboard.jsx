@@ -48,25 +48,17 @@ export default function Dashboard() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return forms;
-    return forms.filter(f =>
-      (f.title && f.title.toLowerCase().includes(q)) ||
-      (f.description && f.description.toLowerCase().includes(q))
-    );
-  }, [forms, query]);
-
+  // real-time title/question/description filter (keeps previous behavior)
   const displayedForms = useMemo(() => {
-    const q = (query || '').trim().toLowerCase()
-    if (!q) return forms
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return forms;
     return forms.filter(f => {
-      const title = (f.title || '').toLowerCase()
-      const question = (f.question || '').toLowerCase()
-      const description = (f.description || '').toLowerCase()
-      return title.includes(q) || question.includes(q) || description.includes(q)
-    })
-  }, [forms, query])
+      const title = (f.title || '').toLowerCase();
+      const question = (f.question || '').toLowerCase();
+      const description = (f.description || '').toLowerCase();
+      return title.includes(q) || question.includes(q) || description.includes(q);
+    });
+  }, [forms, query]);
 
   const averageScore = useMemo(() => {
     if (!forms.length) return '-';
@@ -104,13 +96,6 @@ export default function Dashboard() {
               {forms.length} total forms • Avg score {averageScore}
             </div>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <FilterButton onClick={handleFilterClick} />
-            <button className={styles['create-btn']} onClick={() => setShowModal(true)}>
-              +
-            </button>
-          </div>
         </div>
 
         {loading ? (
@@ -121,12 +106,60 @@ export default function Dashboard() {
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 32, 
-              padding: 32, 
+              gap: 32,
+              padding: 32,
               alignItems: 'stretch',
               boxSizing: 'border-box'
             }}
           >
+            {/* New Form card as first grid item */}
+            <div
+              key="new-form-card"
+              className="dashboard-square"
+              style={{
+                transform: mounted || reduceMotion ? 'none' : 'translateY(10px)',
+                opacity: mounted || reduceMotion ? 1 : 0,
+                transition: reduceMotion ? 'none' : `transform 600ms ${EASE}, opacity 600ms ${EASE}`,
+              }}
+            >
+              <div
+                role="button"
+                onClick={() => setShowModal(true)}
+                onKeyDown={(e) => { if (e.key === 'Enter') setShowModal(true) }}
+                tabIndex={0}
+                className="card"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  gap: 12,
+                  position: 'relative',
+                  height: 280,
+                  width: 280,
+                  minWidth: 220,
+                  maxWidth: 320,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  padding: 20,
+                  background: '#fff',
+                  borderRadius: 8,
+                  border: '1px solid rgba(0,0,0,0.03)'
+                }}
+              >
+                <div className="h3" style={{ marginTop: 0, marginBottom: 8, textAlign: 'center', fontWeight: 700 }}>
+                  Start a New Form
+                </div>
+
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 100, color: '#1976d2', fontWeight: 700 }}>
+                  +
+                </div>
+
+                <div style={{height: 28}} />
+              </div>
+            </div>
+
             {displayedForms.map((f, idx) => (
               <div
                 key={f.id}
@@ -135,7 +168,7 @@ export default function Dashboard() {
                   transform: mounted || reduceMotion ? 'none' : 'translateY(10px)',
                   opacity: mounted || reduceMotion ? 1 : 0,
                   transition: reduceMotion ? 'none' : `transform 600ms ${EASE}, opacity 600ms ${EASE}`,
-                  transitionDelay: reduceMotion ? '0ms' : `${40 + idx * 30}ms`,
+                  transitionDelay: reduceMotion ? '0ms' : `${40 + (idx + 1) * 30}ms`, // account for inserted card
                 }}
               >
                 <FormCard form={f} />

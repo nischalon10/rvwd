@@ -1,24 +1,23 @@
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForms } from '../context/FormsContext'
+import SimpleCopyPopout from '../context/Clipboard'
 
 function getScoreColor(value) {
-  // 0 = dark red, 5 = yellow, 10 = dark green
   if (value <= 5) {
-    // Red to yellow
     const r = 200;
-    const g = Math.round(40 + (value / 5) * 160); // 40 to 200
+    const g = Math.round(40 + (value / 5) * 160);
     return `rgb(${r},${g},40)`;
   } else {
-    // Yellow to green
-    const r = Math.round(200 - ((value - 5) / 5) * 120); // 200 to 80
-    const g = Math.round(200 - ((10 - value) / 5) * 120); // 200 to 320 (clamped at 200)
+    const r = Math.round(200 - ((value - 5) / 5) * 120);
+    const g = Math.round(200 - ((10 - value) / 5) * 120);
     return `rgb(${r},${Math.min(g,200)},40)`;
   }
 }
 
 function Donut({ value }) {
-  const radius = 28 * 1.4; // 40% bigger
-  const stroke = 6 * 1.4;
+  const radius = 32; 
+  const stroke = 8;
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const percent = Math.max(0, Math.min(1, value / 10));
@@ -62,13 +61,12 @@ function Donut({ value }) {
 export default function FormCard({ form }){
   const { forms, setForms } = useForms();
   const navigate = useNavigate();
+  const [shareOpen, setShareOpen] = useState(false)
+
   function handleDelete() {
     setForms(forms.filter(f => f.id !== form.id));
   }
-  function handleShare(e) {
-    e.stopPropagation();
-    navigate(`/share/${form.id}`);
-  }
+  
   return (
   <Link to={`/forms/${form.id}`}
     className="card"
@@ -131,7 +129,9 @@ export default function FormCard({ form }){
           </span>
         </div>
         <button
-          onClick={handleShare}
+          onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}   // prevent Link activation on press
+          onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); }} // mobile touch
+          onClick={(e) => { e.stopPropagation(); setShareOpen(true); }}     // only open clipboard popout
           style={{
             padding: '6px 18px',
             border: 'none',
@@ -151,6 +151,12 @@ export default function FormCard({ form }){
           Share
         </button>
       </div>
+      {shareOpen && (
+        <SimpleCopyPopout
+          text="abem"
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </Link>
   );
 }
