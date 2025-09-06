@@ -25,12 +25,56 @@ export default function SharePage() {
   const [submitting, setSubmitting] = useState(false);
   const [formValid, setFormValid] = useState(true);
   const [checkingForm, setCheckingForm] = useState(true);
-  const mounted = useRef(true);
+  const [formData, setFormData] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    mounted.current = true;
-    return () => { mounted.current = false };
+    mountedRef.current = true;
+    const id = requestAnimationFrame(() => setMounted(true));
+    
+    // Check for reduced motion preference
+    if (typeof window !== 'undefined' && 'matchMedia' in window) {
+      const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setReduceMotion(mql.matches);
+      const onChange = (e) => setReduceMotion(e.matches);
+      mql.addEventListener?.('change', onChange);
+      mql.addListener?.(onChange);
+      return () => {
+        cancelAnimationFrame(id);
+        mountedRef.current = false;
+        mql.removeEventListener?.('change', onChange);
+        mql.removeListener?.(onChange);
+      };
+    }
+    
+    return () => { 
+      cancelAnimationFrame(id);
+      mountedRef.current = false; 
+    };
   }, []);
+
+  // Fetch form data including UI hints
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/forms/${resolvedFormId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFormData(data);
+        } else {
+          console.error('Failed to fetch form data');
+        }
+      } catch (error) {
+        console.error('Error fetching form data:', error);
+      }
+    };
+
+    if (resolvedFormId) {
+      fetchFormData();
+    }
+  }, [resolvedFormId]);
 
   // Timer for recording elapsed time
   useEffect(() => {
@@ -140,9 +184,9 @@ export default function SharePage() {
     setStatusMessage('Submitting response...');
 
     const metadata = {
-      browser: navigator.userAgent,
       timestamp: new Date().toISOString(),
       duration: seconds,
+      anonymous: true
     };
 
     try {
@@ -161,97 +205,539 @@ export default function SharePage() {
       console.error(err);
       setStatusMessage(err?.message || 'Failed to submit response. Please try again.');
     } finally {
-      if (mounted.current) setSubmitting(false);
+      if (mountedRef.current) setSubmitting(false);
     }
   };
 
   return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f4f6fb',padding:24}}>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Animated background elements */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `
+          radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(148, 163, 184, 0.15) 0%, transparent 50%)
+        `,
+        animation: reduceMotion ? 'none' : 'float 20s ease-in-out infinite'
+      }} />
+
       <style>{`
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(25,118,210,0.25); } 70% { box-shadow: 0 0 0 18px rgba(25,118,210,0); } 100% { box-shadow: 0 0 0 0 rgba(25,118,210,0); } }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-20px) rotate(1deg); }
+          66% { transform: translateY(-10px) rotate(-1deg); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.1); }
+          50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.2); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes record-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+          70% { box-shadow: 0 0 0 25px rgba(248, 113, 113, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up {
+          animation: ${reduceMotion ? 'none' : 'slide-up 0.8s ease-out forwards'};
+        }
+        .waveform-bar {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
       `}</style>
 
-      <div style={{width:'100%',maxWidth:980,background:'#ffffff',borderRadius:12,boxShadow:'0 10px 30px rgba(12,24,50,0.08)',padding:28,display:'flex',gap:24,alignItems:'stretch'}}>
-        {/* Left column: question + controls */}
-        <div style={{flex:'0 0 420px',display:'flex',flexDirection:'column',gap:16}}>
-          <div style={{display:'flex',flexDirection:'column',gap:6}}>
-            <div style={{fontSize:18,fontWeight:700,color:'#0f1724'}}>Respond to</div>
-            <h2 style={{margin:0,fontSize:22,fontWeight:700,color:'#0b1220',lineHeight:1.25}}>{question}</h2>
-            <div style={{color:'#6b7280',fontSize:13,marginTop:8}}>Tap the big record button and speak. When finished, tap again to stop and submit your response.</div>
-          </div>
-
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:14,marginTop:8}}>
-            <div
-              role="button"
-              aria-pressed={recording}
-              onClick={handleCircleClick}
-              style={{
-                width:150,
-                height:150,
-                borderRadius:75,
-                background: recording ? '#d32f2f' : 'linear-gradient(180deg,#0b74ff,#195bd8)',
-                display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',
-                boxShadow: recording ? '0 6px 30px rgba(211,47,47,0.18)' : '0 8px 26px rgba(9,30,66,0.08)',
-                animation: recording ? 'pulse 1.8s infinite' : 'none',
-                transition:'transform 160ms ease, box-shadow 160ms ease'
-              }}
-            >
-              {!recording ? (
-                <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#fff"/></svg>
-              ) : (
-                <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><rect x="7" y="7" width="10" height="10" rx="2" fill="#fff"/></svg>
-              )}
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div 
+          className={mounted ? 'slide-up' : ''} 
+          style={{
+            width: '100%',
+            maxWidth: '1100px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
+            padding: '32px',
+            display: 'flex',
+            gap: '40px',
+            alignItems: 'stretch',
+            opacity: mounted ? 1 : 0
+          }}
+        >
+          {/* Left Panel - Recording Interface */}
+          <div style={{
+            flex: '0 0 420px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
+                padding: '6px 14px',
+                borderRadius: '18px',
+                border: '1px solid #bae6fd',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)'
+                }} />
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: '#075985',
+                  letterSpacing: '0.025em'
+                }}>Fully Anonymous Response</span>
+              </div>
+              
+              <h1 style={{
+                margin: 0,
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#1e293b',
+                lineHeight: '1.2',
+                marginBottom: '6px'
+              }}>
+                {formData?.title || 'Voice Response'}
+              </h1>
+              
+              <h2 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: '600',
+                color: '#475569',
+                lineHeight: '1.3'
+              }}>
+                {question}
+              </h2>
             </div>
 
-            <div style={{display:'flex',gap:12,alignItems:'center'}}>
-              <div style={{fontSize:13,color:recording ? '#dc2626' : '#374151',fontWeight:600}}>{recording ? 'Recording' : checkingForm ? 'Checking form...' : formValid ? 'Ready' : 'Invalid form'}</div>
-              <div style={{height:6,width:6,borderRadius:6,background:recording ? '#dc2626' : formValid ? '#c7d2fe' : '#fca5a5'}} />
-              <div style={{color:'#6b7280',fontSize:13,fontFeatureSettings:'"tnum"',fontVariantNumeric:'tabular-nums'}}>{formatTime(seconds)}</div>
+            {/* UI Hints Display */}
+            {formData?.uiHints && formData.uiHints.length > 0 && (
+              <div style={{
+                background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                border: '1px solid #f59e0b',
+                borderRadius: '14px',
+                padding: '16px',
+                marginBottom: '6px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  marginBottom: '10px'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="#f59e0b"/>
+                  </svg>
+                  <span style={{
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: '#92400e'
+                  }}>Response Guidelines</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {formData.uiHints.map((hint, index) => (
+                    <div key={index} style={{
+                      fontSize: '13px',
+                      color: '#a16207',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '6px'
+                    }}>
+                      <span style={{ color: '#f59e0b', fontWeight: '600' }}>•</span>
+                      <span>{hint}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recording Button */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '20px',
+              padding: '24px 0'
+            }}>
+              <div
+                role="button"
+                aria-pressed={recording}
+                onClick={handleCircleClick}
+                style={{
+                  width: '160px',
+                  height: '160px',
+                  borderRadius: '50%',
+                  background: recording 
+                    ? 'linear-gradient(135deg, #f87171, #dc2626)' 
+                    : 'linear-gradient(135deg, #60a5fa, #3b82f6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  border: '3px solid rgba(255, 255, 255, 0.9)',
+                  boxShadow: recording 
+                    ? '0 8px 25px rgba(248, 113, 113, 0.3)' 
+                    : '0 8px 25px rgba(59, 130, 246, 0.3)',
+                  animation: recording ? (reduceMotion ? 'none' : 'record-pulse 2s infinite') : 'none',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: 'scale(1)',
+                  ':hover': {
+                    transform: 'scale(1.05)'
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  if (!reduceMotion) e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseLeave={(e) => {
+                  if (!reduceMotion) e.target.style.transform = 'scale(1)'
+                }}
+              >
+                {!recording ? (
+                  <svg width="55" height="55" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 5v14l11-7L8 5z" fill="white"/>
+                  </svg>
+                ) : (
+                  <svg width="55" height="55" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="6" width="12" height="12" rx="3" fill="white"/>
+                  </svg>
+                )}
+              </div>
+
+              {/* Status and Timer */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'rgba(248, 250, 252, 0.8)',
+                  padding: '10px 18px',
+                  borderRadius: '18px',
+                  border: '1px solid rgba(226, 232, 240, 0.5)'
+                }}>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: recording ? '#ef4444' : (formValid ? '#22c55e' : '#f97316'),
+                    animation: recording ? (reduceMotion ? 'none' : 'pulse-glow 2s infinite') : 'none'
+                  }} />
+                  <span style={{
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: recording ? '#dc2626' : (formValid ? '#166534' : '#ea580c')
+                  }}>
+                    {recording ? 'Recording...' : (checkingForm ? 'Loading...' : (formValid ? 'Ready to Record' : 'Form Unavailable'))}
+                  </span>
+                  <div style={{
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: '#475569',
+                    fontFeatureSettings: '"tnum"',
+                    fontVariantNumeric: 'tabular-nums'
+                  }}>
+                    {formatTime(seconds)}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div style={{width:'100%',padding:12,background:'#f8fafc',borderRadius:8,border:'1px solid #eef2ff',textAlign:'center',color:'#475569'}}>
-              <div style={{fontSize:13,fontWeight:700}}>Waveform</div>
-              <div style={{height:28,marginTop:8,display:'flex',alignItems:'center',gap:6,justifyContent:'center'}}>
-                {/* Simple animated bars as placeholder */}
-                {[0,1,2,3,4,5,6].map((n) => (
-                  <div key={n} style={{width:6,height: Math.max(6, (recording ? (10 + (n * 6)) : 8) ),background:'#c7d2fe',borderRadius:3,opacity:recording ? (0.6 + (n * 0.05)) : 0.6,transition:'height 220ms ease'}} />
+            {/* Waveform Visualization */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
+              borderRadius: '14px',
+              padding: '18px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#334155',
+                marginBottom: '12px',
+                textAlign: 'center'
+              }}>Audio Waveform</div>
+              <div style={{
+                height: '50px',
+                display: 'flex',
+                alignItems: 'end',
+                justifyContent: 'center',
+                gap: '3px'
+              }}>
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="waveform-bar"
+                    style={{
+                      width: '6px',
+                      height: recording 
+                        ? `${Math.max(6, 16 + Math.sin((Date.now() / 200) + i) * 20)}px`
+                        : '10px',
+                      background: recording 
+                        ? `linear-gradient(180deg, #60a5fa, #3b82f6)`
+                        : '#cbd5e1',
+                      borderRadius: '3px',
+                      opacity: recording ? 0.8 + (Math.sin((Date.now() / 300) + i) * 0.2) : 0.6
+                    }}
+                  />
                 ))}
               </div>
             </div>
-          </div>
 
-          <div style={{display:'flex',gap:12,marginTop:12}}>
-            <button onClick={handleRetry} style={{flex:1,padding:'10px 12px',borderRadius:8,border:'1px solid #e6eef9',background:'#fff',color:'#0b1220',fontWeight:600,cursor:'pointer'}}>Retry</button>
-            <button onClick={handleSubmit} disabled={submitting || !formValid} style={{flex:1,padding:'10px 12px',borderRadius:8,border:'none',background: !formValid ? '#9ca3af' : '#0b74ff',color:'#fff',fontWeight:700,cursor: !formValid ? 'not-allowed' : 'pointer',boxShadow:'0 6px 18px rgba(11,116,255,0.12)'}}>{submitting ? 'Submitting...' : 'Submit'}</button>
-          </div>
-
-          {statusMessage && <div style={{marginTop:10,color:'#374151',fontSize:13}}>{statusMessage}</div>}
-        </div>
-
-        {/* Right column: transcript and details */}
-        <div style={{flex:1,display:'flex',flexDirection:'column',gap:12}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div style={{fontSize:14,fontWeight:700,color:'#0b1220'}}>Transcript</div>
-            <div style={{fontSize:12,color:'#9ca3af'}}>{transcript ? `${transcript.length} chars` : 'No text yet'}</div>
-          </div>
-
-          <div style={{flex:1, background: '#ffffff', borderRadius:10, overflow:'hidden', boxShadow: 'inset 0 1px 0 rgba(16,24,40,0.03)'}}>
-            <textarea
-              readOnly
-              value={transcript}
-              placeholder="Your spoken words will appear here..."
-              style={{width:'100%',height:'100%',minHeight:220,resize:'none',border:'none',outline:'none',padding:18,background:'linear-gradient(180deg,#ffffff,#fbfdff)',color:'#061427',fontSize:15,lineHeight:1.5}}
-            />
-          </div>
-
-          <div style={{display:'flex',gap:12,alignItems:'center',justifyContent:'space-between'}}>
-            <div style={{display:'flex',gap:8,alignItems:'center'}}>
-              <div style={{width:10,height:10,borderRadius:8,background:'#e6eef9'}} />
-              <div style={{fontSize:13,color:'#6b7280'}}>Browser: <span style={{color:'#111827',fontWeight:700}}> {navigator.userAgent.split(' ')[0]}</span></div>
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              marginTop: '6px'
+            }}>
+              <button 
+                onClick={handleRetry}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e2e8f0',
+                  background: 'white',
+                  color: '#475569',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  ':hover': {
+                    borderColor: '#cbd5e1',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.borderColor = '#cbd5e1'
+                  if (!reduceMotion) e.target.style.transform = 'translateY(-1px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.borderColor = '#e2e8f0'
+                  if (!reduceMotion) e.target.style.transform = 'translateY(0)'
+                }}
+              >
+                Clear & Retry
+              </button>
+              <button 
+                onClick={handleSubmit}
+                disabled={submitting || !formValid || !transcript}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: (!formValid || !transcript) 
+                    ? '#94a3b8' 
+                    : 'linear-gradient(135deg, #22c55e, #16a34a)',
+                  color: 'white',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: (!formValid || !transcript) ? 'not-allowed' : 'pointer',
+                  boxShadow: (!formValid || !transcript) 
+                    ? 'none' 
+                    : '0 6px 16px rgba(34, 197, 94, 0.25)',
+                  transition: 'all 0.2s ease',
+                  ':hover': !(!formValid || !transcript) ? {
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 8px 20px rgba(34, 197, 94, 0.35)'
+                  } : {}
+                }}
+                onMouseEnter={(e) => {
+                  if (!(!formValid || !transcript) && !reduceMotion) {
+                    e.target.style.transform = 'translateY(-1px)'
+                    e.target.style.boxShadow = '0 8px 20px rgba(34, 197, 94, 0.35)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!(!formValid || !transcript) && !reduceMotion) {
+                    e.target.style.transform = 'translateY(0)'
+                    e.target.style.boxShadow = '0 6px 16px rgba(34, 197, 94, 0.25)'
+                  }
+                }}
+              >
+                {submitting ? 'Submitting...' : 'Submit Response'}
+              </button>
             </div>
-            <div style={{fontSize:12,color:'#9ca3af'}}>Tip: Speak in complete sentences for better transcription results</div>
+
+            {/* Status Message */}
+            {statusMessage && (
+              <div style={{
+                background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+                border: '1px solid #93c5fd',
+                borderRadius: '10px',
+                padding: '12px',
+                color: '#1e40af',
+                fontSize: '13px',
+                fontWeight: '500',
+                textAlign: 'center'
+              }}>
+                {statusMessage}
+              </div>
+            )}
           </div>
 
+          {/* Right Panel - Transcript */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingBottom: '10px',
+              borderBottom: '2px solid #f1f5f9'
+            }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: '16px',
+                fontWeight: '700',
+                color: '#1e293b'
+              }}>Live Transcript</h3>
+              <div style={{
+                fontSize: '12px',
+                color: '#64748b',
+                background: '#f8fafc',
+                padding: '4px 10px',
+                borderRadius: '16px',
+                border: '1px solid #e2e8f0'
+              }}>
+                {transcript ? `${transcript.length} characters` : 'Waiting for speech...'}
+              </div>
+            </div>
+
+            <div style={{
+              flex: 1,
+              background: 'linear-gradient(135deg, #ffffff, #fafbfc)',
+              borderRadius: '14px',
+              border: '2px solid #f1f5f9',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <textarea
+                readOnly
+                value={transcript}
+                placeholder="Start recording to see your spoken words appear here in real-time..."
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  minHeight: '240px',
+                  resize: 'none',
+                  border: 'none',
+                  outline: 'none',
+                  padding: '20px',
+                  background: 'transparent',
+                  color: '#1e293b',
+                  fontSize: '15px',
+                  lineHeight: '1.6',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                }}
+              />
+              {!transcript && (
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#94a3b8'
+                }}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor" opacity="0.3"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <path d="M12 19v4m-4 0h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  <span style={{ fontSize: '13px', textAlign: 'center' }}>
+                    Click the record button to start capturing your voice
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Privacy Notice */}
+            <div style={{
+              background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+              border: '1px solid #bbf7d0',
+              borderRadius: '10px',
+              padding: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="white"/>
+                  <path d="M9 12l2 2 4-4" stroke="#22c55e" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#166534',
+                  marginBottom: '2px'
+                }}>Your Privacy is Protected</div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#15803d',
+                  lineHeight: '1.4'
+                }}>
+                  This response is completely anonymous. No personal information, browser data, or identifying details are collected.
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
